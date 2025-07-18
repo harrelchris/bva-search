@@ -1,0 +1,5 @@
+alias db="bash ./scripts/db.sh"
+alias init="bash ./scripts/init.sh"
+alias lint="bash ./scripts/lint.sh"
+alias run="bash ./scripts/run.sh"
+alias test="bash ./scripts/test.sh"
