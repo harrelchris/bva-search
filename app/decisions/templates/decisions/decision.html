@@ -1,0 +1,8 @@
+{% extends "decisions/base.html" %}
+
+{% block title %}Decision{% endblock %}
+
+{% block content %}
+	<h1>Decision</h1>
+  {{ decision.text|linebreaks }}
+{% endblock %}
