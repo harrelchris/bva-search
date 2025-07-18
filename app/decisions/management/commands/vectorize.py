@@ -2,6 +2,9 @@ from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand
 
 from decisions.models import Decision
+from tasks.models import Task
+
+TASK_NAME = "vectorize"
 
 
 class Command(BaseCommand):
@@ -15,4 +18,12 @@ class Command(BaseCommand):
             decision.search_vector = annotated.vector
             decision.save(update_fields=["search_vector"])
             count += 1
-        self.stdout.write(self.style.SUCCESS(f"{count} decisions vectorized."))
+
+        result = f"{count} decisions vectorized."
+        task = Task(
+            name=TASK_NAME,
+            status=True,
+            description=result,
+        )
+        task.save()
+        self.stdout.write(self.style.SUCCESS(result))
