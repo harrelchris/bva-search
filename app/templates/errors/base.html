@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>{% block status_code %}{% endblock %}</h1>
+    <h2>{% block name %}{% endblock %}</h2>
+    <p>{% block description %}{% endblock %}</p>
+  </div>
+{% endblock %}
