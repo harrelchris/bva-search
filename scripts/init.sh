@@ -10,4 +10,6 @@ source .venv/bin/activate
 
 python -m pip install --upgrade pip
 
+pip install ruff
+
 pip install -r requirements.txt
