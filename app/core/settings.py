@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "decisions.apps.DecisionsConfig",
+    "tasks.apps.TasksConfig",
     "users.apps.UsersConfig",
 ]
 
