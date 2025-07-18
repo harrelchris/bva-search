@@ -13,3 +13,7 @@ python -m pip install --upgrade pip
 pip install ruff
 
 pip install -r requirements.txt
+
+if [ ! -f ".env" ]; then
+  cp envs/local.env .env
+fi
