@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from decisions.models import Decision
 from tasks.models import Task
 
-TASK_NAME = "vectorize"
+TASK_NAME = "vectors"
 
 
 class Command(BaseCommand):
