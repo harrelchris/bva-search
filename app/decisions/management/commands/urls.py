@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand
 import bs4
 import requests
+from django.core.management.base import BaseCommand
 
 from decisions.models import Decision
 from tasks.models import Task
