@@ -12,6 +12,7 @@ class SearchView(TemplateView):
 class ResultsView(ListView):
     model = Decision
     template_name = "decisions/results.html"
+    paginate_by = 100
 
     def get_queryset(self):
         q = self.request.GET.get("q", "")
@@ -31,6 +32,13 @@ class ResultsView(ListView):
             .filter(rank__gte=0.001)
             .order_by("-rank")
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        import urllib.parse
+        query = self.request.GET.get("q", "")
+        context["query"] = urllib.parse.quote_plus(query)
+        return context
 
 
 class DecisionView(DetailView):
