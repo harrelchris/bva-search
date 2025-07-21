@@ -9,6 +9,7 @@
     {% for decision in decision_list %}
       <div>
         <p><a href="{% url 'decisions:decision' pk=decision.pk %}">{{ decision.pk }}</a></p>
+        <p>{{ decision.rank }}</p>
         <p>{{ decision.headline|safe }}</p>
       </div>
     {% endfor %}
