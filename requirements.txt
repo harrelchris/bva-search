@@ -1,5 +1,6 @@
 beautifulsoup4
 django
+django-debug-toolbar
 django-environ
 lxml
 psycopg[binary]

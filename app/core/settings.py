@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "decisions.apps.DecisionsConfig",
     "tasks.apps.TasksConfig",
     "users.apps.UsersConfig",
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -103,6 +105,11 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = "users.User"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
 
 MEDIA_ROOT = BASE_DIR.parent / ".media/"
 

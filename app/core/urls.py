@@ -16,6 +16,7 @@ if settings.DEBUG:
     urlpatterns.extend(static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
     urlpatterns.extend(
         [
+            path("__debug__/", include("debug_toolbar.urls")),
             path(
                 "400/",
                 defaults.bad_request,
