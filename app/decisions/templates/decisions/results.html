@@ -3,21 +3,22 @@
 {% block title %}Results{% endblock %}
 
 {% block content %}
-	<h1>Results</h1>
-
-  {% if decision_list %}
-    {% for decision in decision_list %}
+  <div class="container my-5">
+    <p><a href="{% url 'decisions:search' %}">New Search</a></p>
+    {% if decision_list %}
+      {% for decision in decision_list %}
+        <div>
+          <p><a href="{% url 'decisions:decision' pk=decision.pk %}">{{ decision.pk }}</a></p>
+          <p>{{ decision.rank }}</p>
+          <p>{{ decision.headline|safe }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
       <div>
-        <p><a href="{% url 'decisions:decision' pk=decision.pk %}">{{ decision.pk }}</a></p>
-        <p>{{ decision.rank }}</p>
-        <p>{{ decision.headline|safe }}</p>
+        <p>No results found.</p>
       </div>
-    {% endfor %}
-  {% else %}
-    <div>
-      <p>No results found.</p>
-    </div>
-  {% endif %}
+    {% endif %}
 
-  {% include "decisions/pagination.html" %}
+    {% include "decisions/pagination.html" %}
+  </div>
 {% endblock %}

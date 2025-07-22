@@ -40,7 +40,8 @@ class ResultsView(ListView):
         context = super().get_context_data(**kwargs)
 
         query = self.request.GET.get("q", "")
-        context["query"] = urllib.parse.quote_plus(query)
+        context["query"] = query
+        context["query_url"] = urllib.parse.quote_plus(query)
         return context
 
 
