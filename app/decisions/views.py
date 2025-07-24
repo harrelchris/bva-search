@@ -1,3 +1,4 @@
+import datetime
 import urllib.parse
 
 from django.contrib.postgres.search import SearchHeadline, SearchQuery, SearchRank
@@ -27,7 +28,13 @@ class ResultsView(ListView):
         if not q:
             return Decision.objects.none()
 
-        query = SearchQuery(q, search_type="websearch")
+        today = datetime.date.today()
+        start_date = datetime.date(
+            year=today.year - 1,
+            month=1,
+            day=1
+        )
+        query = SearchQuery(q, search_type="websearch", config="english")
         query_set = Decision.objects.filter(search_vector=query)
         query_set = query_set.annotate(
             rank=SearchRank(F("search_vector"), query),
@@ -38,13 +45,13 @@ class ResultsView(ListView):
                 stop_sel="</mark>",
             )
         ).filter(
+            date__range=(start_date, today),
             rank__gte=0.02
-        ).order_by("-rank").values("pk", "headline", "rank")
+        ).order_by("-rank").values("pk", "headline", "rank", "date", "url")
         return query_set
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         query = self.request.GET.get("q", "")
         context["query"] = query
         context["query_url"] = urllib.parse.quote_plus(query)
