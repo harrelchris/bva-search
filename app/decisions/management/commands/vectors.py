@@ -11,10 +11,12 @@ class Command(BaseCommand):
     help = "Populate the search_vector field for full-text search"
 
     def handle(self, *args, **options):
+        self.stdout.write(f"Vectorizing decisions")
         queryset = Decision.objects.filter(text__isnull=False, search_vector__isnull=True)
-        count = queryset.update(search_vector=SearchVector("text"))
-
-        result = f"{count} decisions vectorized."
+        count = len(queryset)
+        self.stdout.write(f"{count} decisions found")
+        count = queryset.update(search_vector=SearchVector("text", config="english"))
+        result = f"{count} decisions vectorized"
         Task.objects.create(
             name=TASK_NAME,
             status=True,
