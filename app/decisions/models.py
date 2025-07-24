@@ -15,3 +15,12 @@ class Decision(models.Model):
         indexes = [
             GinIndex(fields=["search_vector"]),
         ]
+
+
+class Query(models.Model):
+    string = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Queries"
+        ordering = ['-created']

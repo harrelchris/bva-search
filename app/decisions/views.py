@@ -4,7 +4,7 @@ from django.contrib.postgres.search import SearchHeadline, SearchQuery, SearchRa
 from django.db.models import F
 from django.views.generic import DetailView, ListView, TemplateView
 
-from decisions.models import Decision
+from decisions.models import Decision, Query
 
 
 class SearchView(TemplateView):
@@ -15,6 +15,12 @@ class ResultsView(ListView):
     model = Decision
     template_name = "decisions/results.html"
     paginate_by = 100
+
+    def get(self, request, *args, **kwargs):
+        q = self.request.GET.get("q", "")
+        if q:
+            Query.objects.create(string=q)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         q = self.request.GET.get("q", "")
