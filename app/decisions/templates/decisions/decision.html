@@ -2,6 +2,15 @@
 
 {% block title %}{{ decision.pk }}{% endblock %}
 
+{% block extra_head %}
+  <style>
+    body {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
   <div class="container my-5">
     {{ decision.text|linebreaks }}

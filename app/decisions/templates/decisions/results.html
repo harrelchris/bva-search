@@ -3,22 +3,49 @@
 {% block title %}Results{% endblock %}
 
 {% block content %}
-  <div class="container my-5">
-    <p><a href="{% url 'decisions:search' %}">New Search</a></p>
-    {% if decision_list %}
-      {% for decision in decision_list %}
-        <div>
-          <p><a href="{% url 'decisions:decision' pk=decision.pk %}">{{ decision.pk }}</a></p>
-          <p>{{ decision.rank }}</p>
-          <p>{{ decision.headline|safe }}</p>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div>
-        <p>No results found.</p>
+  <div class="container">
+    <div class="row my-5">
+      <div class="col-10 mx-auto">
+        {% include "decisions/components/search_form.html" %}
       </div>
-    {% endif %}
+    </div>
+    <div class="row my-5">
+      <div class="col-10 mx-auto">
+        {% if decision_list %}
+          {% for decision in decision_list %}
+            <div class="card my-3 border-0">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <span class="me-2">{{ forloop.counter }}.</span>
+                  <a href="{% url 'decisions:decision' pk=decision.pk %}" class="text-decoration-none">{{ decision.pk }}</a>
+                </h5>
+                <p class="card-text my-2">{{ decision.headline|safe }}</p>
+                <p class="card-text text-small">
+                  <small class="text-body-secondary me-3">
+                    {{ decision.date }}
+                  </small>
+                  <small class="text-body-secondary mx-3">
+                    <a href="{{ decision.url }}" class="text-decoration-none">Source</a>
+                  </small>
+                  <small class="text-body-secondary mx-3">
+                    Relevancy: {{ decision.rank }}
+                  </small>
+                </p>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div>
+            <p>No results found.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
 
-    {% include "decisions/pagination.html" %}
+    <div class="row my-5">
+      <div class="col-10 mx-auto d-flex justify-content-center">
+        {% include "decisions/pagination.html" %}
+      </div>
+    </div>
   </div>
 {% endblock %}
