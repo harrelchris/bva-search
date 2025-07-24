@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "debug_toolbar",
     "decisions.apps.DecisionsConfig",
     "tasks.apps.TasksConfig",
