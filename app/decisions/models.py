@@ -9,6 +9,7 @@ class Decision(models.Model):
     lastmod = models.DateField()
     text = models.TextField(null=True, blank=True)
     search_vector = SearchVectorField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
 
     class Meta:
         indexes = [
