@@ -4,8 +4,8 @@
 
 {% block content %}
   <div class="container">
-    <div class="row">
-      <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <div class="row my-5">
+      <div class="p-5 text-center rounded-3">
         <h1 class="text-body-emphasis">BVA Search</h1>
         <p class="lead">
           Search decisions from the Board of Veterans' Appeals
@@ -15,6 +15,58 @@
     <div class="row my-5">
       <div class="col-10 mx-auto">
         {% include "decisions/components/search_form.html" %}
+      </div>
+    </div>
+    <div class="row my-5">
+      <h4 class="text-center my-3">Advanced Search</h4>
+      <div class="col-10 mx-auto d-flex justify-content-center">
+        <table class="table table-hover table-borderless w-auto my-3">
+          <thead>
+            <tr class="text-center">
+              <th>Operation</th>
+              <th>Example</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center">AND</td>
+              <td class="text-center">
+                <a href="{% url 'decisions:results' %}?q=tinnitus+vertigo">
+                  tinnitus vertigo
+                </a>
+              </td>
+              <td>Results with both words</td>
+            </tr>
+            <tr>
+              <td class="text-center">OR</td>
+              <td class="text-center">
+                <a href="{% url 'decisions:results' %}?q=tinnitus+OR+vertigo">
+                  tinnitus OR vertigo
+                </a>
+              </td>
+              <td>Results with  either word</td>
+            </tr>
+            <tr>
+              <td class="text-center">NOT</td>
+              <td class="text-center">
+                <a href="{% url 'decisions:results' %}?q=tinnitus+-vertigo">
+                  tinnitus -vertigo
+                </a>
+              </td>
+              <td>Results with tinnitus but not vertigo</td>
+            </tr>
+            <tr>
+              <td class="text-center">Phrase</td>
+              <td class="text-center">
+                <a href='{% url "decisions:results" %}?q=\"vertigo+secondary+to+tinnitus"'>
+                  "vertigo secondary to tinnitus"
+                </a>
+              </td>
+              <td>Search for this exact phrase</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

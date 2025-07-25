@@ -24,11 +24,8 @@
                   <small class="text-body-secondary me-3">
                     {{ decision.date }}
                   </small>
-                  <small class="text-body-secondary mx-3">
+                  <small class="text-body-secondary">
                     <a href="{{ decision.url }}" class="text-decoration-none">Source</a>
-                  </small>
-                  <small class="text-body-secondary mx-3">
-                    Relevancy: {{ decision.rank }}
                   </small>
                 </p>
               </div>
@@ -41,7 +38,6 @@
         {% endif %}
       </div>
     </div>
-
     <div class="row my-5">
       <div class="col-10 mx-auto d-flex justify-content-center">
         {% include "decisions/pagination.html" %}
