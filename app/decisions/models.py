@@ -23,4 +23,4 @@ class Query(models.Model):
 
     class Meta:
         verbose_name_plural = "Queries"
-        ordering = ['-created']
+        ordering = ["-created"]

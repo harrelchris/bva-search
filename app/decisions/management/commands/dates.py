@@ -9,6 +9,7 @@ from tasks.models import Task
 TASK_NAME = "dates"
 DEFAULT_DATE = datetime.date(year=1970, month=1, day=1)
 
+
 class Command(BaseCommand):
     help = "Extract date from text, url, or use default date of 1970/01/01"
 
