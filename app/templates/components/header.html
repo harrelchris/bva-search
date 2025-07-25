@@ -1,0 +1,11 @@
+<header class="container-fluid d-flex flex-wrap justify-content-center py-3 mb-4">
+  <a href="{% url 'decisions:search' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+    <span class="fs-3 ms-3">BVA Search</span>
+  </a>
+  {% include "decisions/components/search_form.html" %}
+  <div class="text-end ms-2">
+    <button type="button" class="btn btn-outline-secondary me-2" id="themeToggle">
+      <i class="bi bi-moon" id="themeIcon"></i>
+    </button>
+  </div>
+</header>
