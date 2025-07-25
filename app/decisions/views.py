@@ -6,10 +6,18 @@ from django.db.models import F
 from django.views.generic import DetailView, ListView, TemplateView
 
 from decisions.models import Decision, Query
+from tasks.models import Task
 
 
 class SearchView(TemplateView):
     template_name = "decisions/search.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["decision_count"] = Decision.objects.all().count()
+        latest_datetime = Task.objects.filter(name="urls").order_by("-datetime").first()
+        context["latest_date"] = latest_datetime.datetime.date().strftime("%x")
+        return context
 
 
 class ResultsView(ListView):
