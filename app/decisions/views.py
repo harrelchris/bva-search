@@ -18,13 +18,13 @@ class ResultsView(ListView):
     paginate_by = 100
 
     def get(self, request, *args, **kwargs):
-        q = self.request.GET.get("q", "")
+        q = self.request.GET.get("q", "").strip()
         if q:
             Query.objects.create(string=q)
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        q = self.request.GET.get("q", "")
+        q = self.request.GET.get("q", "").strip()
         if not q:
             return Decision.objects.none()
 
@@ -46,15 +46,14 @@ class ResultsView(ListView):
             )
         ).filter(
             date__range=(start_date, today),
-            rank__gte=0.02
-        ).order_by("-rank").values("pk", "headline", "rank", "date", "url")
+        ).order_by("-rank").values("pk", "headline", "date", "url")
         return query_set
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        query = self.request.GET.get("q", "")
-        context["query"] = query
-        context["query_url"] = urllib.parse.quote_plus(query)
+        q = self.request.GET.get("q", "").strip()
+        context["query"] = q
+        context["query_url"] = urllib.parse.quote_plus(q)
         return context
 
 
