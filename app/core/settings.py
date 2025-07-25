@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "debug_toolbar",
     "decisions.apps.DecisionsConfig",
+    "index.apps.IndexConfig",
     "tasks.apps.TasksConfig",
     "users.apps.UsersConfig",
 ]

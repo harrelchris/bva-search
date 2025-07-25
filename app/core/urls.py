@@ -8,6 +8,7 @@ admin.site.index_title = admin.site.name = admin.site.site_header = admin.site.s
 
 urlpatterns = [
     path("", include("decisions.urls"), name="decisions"),
+    path("", include("index.urls"), name="index"),
     path("admin/", admin.site.urls),
 ]
 
