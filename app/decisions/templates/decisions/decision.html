@@ -12,13 +12,8 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container my-5">
-    <div class="row my-5">
-      <div class="col-10 mx-auto">
-        {% include "decisions/components/search_form.html" %}
-      </div>
-    </div>
-    <div class="row my-5">
+  <div class="container my-3">
+    <div class="row my-3">
       <div class="col-10 mx-auto">
         {{ decision.text|linebreaks }}
       </div>
