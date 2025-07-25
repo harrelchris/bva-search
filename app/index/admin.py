@@ -4,7 +4,11 @@ from index.models import Contact
 
 
 class ContactAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "name",
+        "email",
+        "created",
+    ]
 
 
 admin.site.register(Contact, ContactAdmin)

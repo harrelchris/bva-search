@@ -10,7 +10,11 @@ class AboutView(TemplateView):
 
 class ContactView(CreateView):
     model = Contact
-    fields = "__all__"
+    fields = [
+        "name",
+        "email",
+        "message",
+    ]
     success_url = "/"
     template_name = "index/contact.html"
 
