@@ -1,8 +1,9 @@
 import unicodedata
-from concurrent.futures import as_completed
+from concurrent.futures import Future, as_completed
 
 from django.core.management.base import BaseCommand
-from django.db.utils import DataError
+from django.db import DataError
+from django.db.models import QuerySet
 from requests_futures.sessions import FuturesSession
 
 from decisions.models import Decision
@@ -10,6 +11,7 @@ from tasks.models import Task
 
 TASK_NAME = "text"
 BATCH_SIZE = 100
+
 session = FuturesSession()
 
 
@@ -17,56 +19,95 @@ class Command(BaseCommand):
     help = "Fetch text for urls from BVA server"
 
     def handle(self, *args, **options):
-        status = True
-        description = None
-        errors = 0
-        while True:
-            # Get all decision records with null text
-            query_set = Decision.objects.filter(text__isnull=True).values_list("pk", "url")[:BATCH_SIZE]
-            if not query_set:
-                description = "No null text decisions"
-                break
+        query_set = get_query_set()
+        discovered = query_set.count()
 
-            # Request urls in batches
-            futures = []
-            for pk, url in query_set:
-                future = session.get(url)
-                future.pk = pk
-                futures.append(future)
+        if not discovered:
+            self.record_success(f"{discovered} new decisions")
+            return
 
-            decisions = []
-            for future in as_completed(futures):
-                response = future.result()
-                decision = Decision.objects.get(pk=future.pk)
-                decision.text = response.text
-                decisions.append(decision)
+        updated_objects = 0
+        query_set_chunks = chunk_queryset(qs=query_set, n=BATCH_SIZE)
+        for query_set_chunk in query_set_chunks:
+            futures = create_futures(query_set_chunk)
+            responses = request_futures(futures)
+            decisions = modify_decisions(responses)
+            count = self.save_decisions(decisions)
+            updated_objects += count
 
-            # Try updating in bulk, then clean and retry individually
-            try:
-                Decision.objects.bulk_update(decisions, ["text"])
-            except DataError:
-                for decision in decisions:
-                    try:
-                        cleaned_text = clean_null_bytes(decision.text)
-                        decision.text = cleaned_text
-                        decision.save()
-                    except DataError as e:
-                        status = False
-                        errors += 1
-                        bad_chars = [c for c in decision.text if ord(c) < 32 and c not in "\n\r\t"]
-                        msg = f"Error saving {decision.pk}: {e}. Problematic characters: {bad_chars}"
-                        self.stdout.write(self.style.ERROR(msg))
-            msg = f"Fetched {BATCH_SIZE} decisions: {decisions[0].pk} - {decisions[-1].pk}"
-            self.stdout.write(self.style.SUCCESS(msg))
+        self.record_success(f"{updated_objects} decisions updated")
 
-        if errors:
-            description = f"{errors} errors"
-
+    def record_success(self, msg: str):
+        self.stdout.write(self.style.SUCCESS(msg))
         Task.objects.create(
             name=TASK_NAME,
-            status=status,
-            description=description,
+            status=True,
+            description=msg,
         )
+
+    def record_error(self, msg: str):
+        self.stdout.write(self.style.ERROR(msg))
+        Task.objects.create(
+            name=TASK_NAME,
+            status=False,
+            description=msg,
+        )
+
+    def save_decisions(self, decisions: list[Decision]) -> int:
+        try:
+            updated_objects = Decision.objects.bulk_update(decisions, ["text"])
+        except DataError:
+            updated_objects = 0
+            for decision in decisions:
+                cleaned_text = clean_null_bytes(decision.text)
+                decision.text = cleaned_text
+                try:
+                    decision.save()
+                except DataError:
+                    self.record_error(f"Error fetching text: {decision.pk} - {decision.url}")
+                    continue
+                else:
+                    updated_objects += 1
+            return updated_objects
+        else:
+            return updated_objects
+
+
+def get_query_set():
+    return Decision.objects.filter(text__isnull=True).values_list("pk", "url")
+
+
+def chunk_queryset(qs: QuerySet, n: int):
+    total = qs.count()
+    for start in range(0, total, n):
+        yield qs[start : start + n]
+
+
+def create_futures(query_set: QuerySet) -> list[Future]:
+    futures = []
+    for pk, url in query_set:
+        future = session.get(url)
+        future.pk = pk
+        futures.append(future)
+    return futures
+
+
+def request_futures(futures: list[Future]):
+    responses = []
+    for future in as_completed(futures):
+        response = future.result()
+        response.pk = future.pk  # noqa
+        responses.append(response)
+    return responses
+
+
+def modify_decisions(responses: list) -> list[Decision]:
+    decisions = []
+    for response in responses:
+        decision = Decision.objects.get(pk=response.pk)
+        decision.text = response.text
+        decisions.append(decision)
+    return decisions
 
 
 def clean_null_bytes(text: str) -> str:

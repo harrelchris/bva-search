@@ -2,6 +2,7 @@ import datetime
 import urllib.parse
 
 from django.core.management.base import BaseCommand
+from django.db import DataError
 
 from decisions.models import Decision
 from tasks.models import Task
@@ -14,32 +15,62 @@ class Command(BaseCommand):
     help = "Extract date from text, url, or use default date of 1970/01/01"
 
     def handle(self, *args, **options):
-        query_set = Decision.objects.filter(date__isnull=True)
+        query_set = get_query_set()
+        discovered = query_set.count()
+
+        if not discovered:
+            self.record_success(f"{discovered} new decisions")
+            return
 
         decisions = []
         for decision in query_set:
-            if not decision.text:
-                continue
-            elif decision.text.startswith("<"):
-                # HTML error response. Clear to request text again.
-                decision.text = None
-                decision.search_vector = None
-                decision.save()
+            # HTML error page. Need to request again
+            if decision.text.startswith("<"):
+                reset_decision(decision)
+                self.record_error(f"Error extracting date: {decision.pk} - {decision.url}")
                 continue
             else:
                 date = extract_text_date(decision.text) or extract_url_date(decision.url) or DEFAULT_DATE
                 decision.date = date
                 decisions.append(decision)
+        self.save_decisions(decisions)
+        self.record_success(f"{len(decisions)} objects updated")
 
-        Decision.objects.bulk_update(decisions, ["date"])
-
-        msg = f"Extracted {len(decisions)} dates"
+    def record_success(self, msg: str):
         self.stdout.write(self.style.SUCCESS(msg))
         Task.objects.create(
             name=TASK_NAME,
             status=True,
             description=msg,
         )
+
+    def record_error(self, msg: str):
+        self.stdout.write(self.style.ERROR(msg))
+        Task.objects.create(
+            name=TASK_NAME,
+            status=False,
+            description=msg,
+        )
+
+    def save_decisions(self, decisions: list[Decision]) -> int:
+        try:
+            updated_objects = Decision.objects.bulk_update(decisions, ["date"])
+        except DataError:
+            for decision in decisions:
+                try:
+                    decision.save()
+                except DataError:
+                    self.record_error(f"Error saving date: {decision.pk} - {decision.url}")
+
+
+def get_query_set():
+    return Decision.objects.filter(text__isnull=False, date__isnull=True)
+
+
+def reset_decision(decision: Decision):
+    decision.text = None
+    decision.search_vector = None
+    decision.save()
 
 
 def extract_text_date(text: str) -> datetime.date | None:
