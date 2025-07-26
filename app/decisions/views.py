@@ -37,24 +37,25 @@ class ResultsView(ListView):
             return Decision.objects.none()
 
         today = datetime.date.today()
-        start_date = datetime.date(
-            year=today.year - 1,
-            month=1,
-            day=1
-        )
+        start_date = datetime.date(year=today.year - 1, month=1, day=1)
         query = SearchQuery(q, search_type="websearch", config="english")
         query_set = Decision.objects.filter(search_vector=query)
-        query_set = query_set.annotate(
-            rank=SearchRank(F("search_vector"), query),
-            headline=SearchHeadline(
-                expression=F("text"),
-                query=query,
-                start_sel="<mark>",
-                stop_sel="</mark>",
+        query_set = (
+            query_set.annotate(
+                rank=SearchRank(F("search_vector"), query),
+                headline=SearchHeadline(
+                    expression=F("text"),
+                    query=query,
+                    start_sel="<mark>",
+                    stop_sel="</mark>",
+                ),
             )
-        ).filter(
-            date__range=(start_date, today),
-        ).order_by("-rank").values("pk", "headline", "date", "url")
+            .filter(
+                date__range=(start_date, today),
+            )
+            .order_by("-rank")
+            .values("pk", "headline", "date", "url")
+        )
         return query_set
 
     def get_context_data(self, **kwargs):

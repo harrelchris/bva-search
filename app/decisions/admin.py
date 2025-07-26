@@ -12,10 +12,8 @@ class DecisionAdmin(admin.ModelAdmin):
 
 
 class QueryAdmin(admin.ModelAdmin):
-    list_display = [
-        "string",
-        "created"
-    ]
+    list_display = ["string", "created"]
+
 
 admin.site.register(Decision, DecisionAdmin)
 admin.site.register(Query, QueryAdmin)
